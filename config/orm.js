@@ -12,13 +12,7 @@ var orm = {
         connection.query(queryString, [table, col, answer.charAt(0).toUpperCase() + answer.slice(1)], function(err, res) {
             if (err) throw err; 
         })
-    },
-    addNumber: function(table, col, answer){
-        var queryString = "INSERT INTO ?? (??) VALUES (?)";
-        connection.query(queryString, [table, col, answer], function(err, res) {
-            if (err) throw err; 
-        })
-    } 
+    }
 };
 
 module.exports = orm;

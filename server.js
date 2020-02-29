@@ -141,8 +141,7 @@ function addEmployee() {
         var last = answer.manager.split(" ")[1];
 
         connection.query(
-          "SELECT id FROM employee WHERE first_name= ?, AND last_name= ?",
-          (last, first, last),
+          "SELECT id FROM employee WHERE first_name= ?", [first, last],
           function(err, resultManagerID) {
             if (err) throw err;
             var managerID = resultManagerID[0].id;
@@ -157,14 +156,10 @@ function addEmployee() {
                 console.log(roleID);
 
                 connection.query(
-                  "INSERT INTO employee (first_name, last_name, role_id) VALUES (?, ?, ?)",
-                  (answer.first, answer.last, roleID),
+                  "INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)",
+                  [answer.first, answer.last, roleID, managerID],
                   function(err, data) {
                     if (err) throw err;
-
-                    console.log(answer.first + " " + answer.last);
-                    console.log(answer.role);
-                    console.log(answer.manager);
 
                     employeeTracker();
                   }
