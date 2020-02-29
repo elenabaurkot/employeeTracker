@@ -140,6 +140,8 @@ function addEmployee() {
         var first = answer.manager.split(" ")[0];
         var last = answer.manager.split(" ")[1];
 
+        // get employee id from first name 
+        // add in last name too 
         connection.query(
           "SELECT id FROM employee WHERE first_name= ?",
           [first, last],
@@ -148,6 +150,7 @@ function addEmployee() {
             var managerID = resultManagerID[0].id;
             console.log(managerID);
 
+            // get role ID from role name
             connection.query(
               "SELECT id FROM role WHERE title= ?",
               answer.role,
@@ -156,6 +159,7 @@ function addEmployee() {
                 var roleID = resultRoleId[0].id;
                 console.log(roleID);
 
+                // add employee first and last name, role id and manager id to the employee table
                 connection.query(
                   "INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)",
                   [answer.first, answer.last, roleID, managerID],
@@ -176,6 +180,7 @@ function addEmployee() {
 // Add Role
 function addRole() {
   // query the database for all items in the department table and make array of all department names
+
   connection.query("SELECT * FROM department", function(err, results) {
     if (err) throw err;
     var departmentArray = [];
@@ -202,7 +207,7 @@ function addRole() {
         }
       ])
       .then(function(answer) {
-        // need to add in department id
+        // get department ID from the department name
         connection.query(
           "SELECT id FROM department WHERE name = ?",
           answer.roleDepartmentID,
@@ -211,10 +216,53 @@ function addRole() {
             var roleDepartmentID = resultDepartmentID[0].id;
             console.log(roleDepartmentID);
 
+            // Add role name, salary, and department id to role table
             orm.addRoleIn("role", "title", "salary", "department_id", answer.roleTitle, parseInt(answer.roleSalary), roleDepartmentID)
             employeeTracker();
           }
         );
       });
+  });
+}
+
+function updateEmployee(){
+
+  connection.query(
+    "SELECT first_name, last_name FROM employee",
+    function(err, resultsEmployees
+    ) {
+      if (err) throw err;
+      var employeeArray = [];
+      for (var i = 0; i < resultsEmployees.length; i++) {
+        employeeArray.push(resultsEmployees[i].first_name + ' ' + resultsEmployees[i].last_name)
+      }
+  
+  // query the database for all items in the role table and make array of all roles
+  var roleArray = [];
+  connection.query("SELECT * FROM role", function(err, results) {
+    if (err) throw err;
+    // if (err) throw err;
+    for (var i = 0; i < results.length; i++) {
+      roleArray.push(results[i].title);
+    }
+    return roleArray;
+  })
+  inquirer
+   .prompt([
+      {
+        name: "employeeUpdate",
+        type: "list",
+        message: "Which employee would you like to update?",
+        choices: employeeArray
+      },
+      {
+        name: "employeeUpdate",
+        type: "list",
+        message: "What would you like to update their role to?",
+        choices: roleArray
+      }
+    ]).then(function(answer) {
+      // need to update old employee role with new
+    }) 
   });
 }
