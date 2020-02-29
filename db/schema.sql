@@ -15,7 +15,7 @@ CREATE TABLE role (
     id INT PRIMARY KEY AUTO_INCREMENT,
     title VARCHAR(30) NOT NULL,
     -- Does float make it a decimal or do I have to put decimal key word instead
-    salary FLOAT NOT NULL,
+    salary INT NOT NULL,
     department_id INT NOT NULL
     -- PRIMARY KEY (id)
 );

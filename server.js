@@ -93,7 +93,7 @@ function addEmployee() {
   connection.query("SELECT * FROM role", function(err, results) {
     if (err) throw err;
     var roleArray = [];
-    if (err) throw err;
+    // if (err) throw err;
     for (var i = 0; i < results.length; i++) {
       roleArray.push(results[i].title);
     }
@@ -141,7 +141,8 @@ function addEmployee() {
         var last = answer.manager.split(" ")[1];
 
         connection.query(
-          "SELECT id FROM employee WHERE first_name= ?", [first, last],
+          "SELECT id FROM employee WHERE first_name= ?",
+          [first, last],
           function(err, resultManagerID) {
             if (err) throw err;
             var managerID = resultManagerID[0].id;
@@ -166,6 +167,52 @@ function addEmployee() {
                 );
               }
             );
+          }
+        );
+      });
+  });
+}
+
+// Add Role
+function addRole() {
+  // query the database for all items in the department table and make array of all department names
+  connection.query("SELECT * FROM department", function(err, results) {
+    if (err) throw err;
+    var departmentArray = [];
+    for (var i = 0; i < results.length; i++) {
+      departmentArray.push(results[i].name);
+    }
+    inquirer
+      .prompt([
+        {
+          name: "roleTitle",
+          type: "input",
+          message: "What role would you like to add?"
+        },
+        {
+          name: "roleSalary",
+          type: "input",
+          message: "What is the salary for this role?"
+        },
+        {
+          name: "roleDepartmentID",
+          type: "list",
+          message: "What is the salary for this role?",
+          choices: departmentArray
+        }
+      ])
+      .then(function(answer) {
+        // need to add in department id
+        connection.query(
+          "SELECT id FROM department WHERE name = ?",
+          answer.roleDepartmentID,
+          function(err, resultDepartmentID) {
+            if (err) throw err;
+            var roleDepartmentID = resultDepartmentID[0].id;
+            console.log(roleDepartmentID);
+
+            orm.addRoleIn("role", "title", "salary", "department_id", answer.roleTitle, parseInt(answer.roleSalary), roleDepartmentID)
+            employeeTracker();
           }
         );
       });
