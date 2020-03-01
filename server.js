@@ -141,6 +141,7 @@ function addDepartment() {
     })
     .then(function(answer) {
       orm.add("department", "name", answer.department);
+      orm.selectAll("department");
       employeeTracker();
     });
 }
@@ -223,6 +224,7 @@ function addEmployee() {
                   function(err, data) {
                     if (err) throw err;
 
+                    orm.selectAll("employee");
                     employeeTracker();
                   }
                 );
@@ -259,7 +261,7 @@ function addRole() {
         {
           name: "roleDepartmentID",
           type: "list",
-          message: "What is the salary for this role?",
+          message: "What department would you like to add this role to?",
           choices: departmentArray
         }
       ])
@@ -283,6 +285,7 @@ function addRole() {
               parseInt(answer.roleSalary),
               roleDepartmentID
             );
+            orm.selectAll("role");
             employeeTracker();
           }
         );

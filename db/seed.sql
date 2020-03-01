@@ -11,13 +11,14 @@ INSERT INTO role (title, salary, department_id) VALUES('Accounting Manager', 900
 INSERT INTO role (title, salary, department_id) VALUES('Development Manager', 90000, 4);
 INSERT INTO role (title, salary, department_id) VALUES('Marketing Manager', 90000, 3);
 
-INSERT INTO employee(first_name, last_name, role_id) VALUES('Eli', 'Smol', 2);
-INSERT INTO employee(first_name, last_name, role_id) VALUES('Matt', 'Green', 3);
-INSERT INTO employee(first_name, last_name, role_id) VALUES('Sam', 'Smith', 4);
-INSERT INTO employee(first_name, last_name, role_id) VALUES('Elle', 'Woods', 2);
-INSERT INTO employee(first_name, last_name, role_id) VALUES('Michael', 'Scott', 1);
+INSERT INTO employee(first_name, last_name, role_id, manager_id) VALUES('Eli', 'Smol', 2);
+INSERT INTO employee(first_name, last_name, role_id, manager_id) VALUES('Matt', 'Green', 3, 8);
+INSERT INTO employee(first_name, last_name, role_id, manager_id) VALUES('Sam', 'Smith', 4, 7);
+INSERT INTO employee(first_name, last_name, role_id, manager_id) VALUES('Elle', 'Woods', 2);
+INSERT INTO employee(first_name, last_name, role_id, manager_id) VALUES('Michael', 'Scott', 1, 6);
 INSERT INTO employee(first_name, last_name, role_id) VALUES('Sara', 'Patel', 7);
 INSERT INTO employee(first_name, last_name, role_id) VALUES('Mitch', 'Conors', 6);
 INSERT INTO employee(first_name, last_name, role_id) VALUES('Cynthia', 'Scott', 5);
-
-
+INSERT INTO employee(first_name, last_name, role_id, manager_id) VALUES('Frank', 'Sanders', 4, 7);
+INSERT INTO employee(first_name, last_name, role_id, manager_id) VALUES('Tammy', 'Waters', 1, 6);
+INSERT INTO employee(first_name, last_name, role_id, manager_id) VALUES('Matthew', 'Franklin', 3, 8);
