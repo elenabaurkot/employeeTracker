@@ -12,7 +12,7 @@ function employeeTracker() {
       message: "What would you like to do?",
       choices: [
         "View All Employees",
-        "View All Departments",
+        "View All Employees by Department",
         "View All Employee Roles",
         "Add Department",
         "Add Employee",
@@ -26,9 +26,9 @@ function employeeTracker() {
         case "View All Employees":
           viewEmployees();
           break;
-
-        case "View All Departments":
-          viewDepartments();
+        
+        case "View All Employees by Department":
+          viewEmployeesByDepartment();
           break;
 
         case "View All Employee Roles":
@@ -62,11 +62,48 @@ function viewEmployees() {
   orm.selectAll("employee");
   employeeTracker();
 }
+
 // view all departments
-function viewDepartments() {
-  orm.selectAll("department");
-  employeeTracker();
+// function viewDepartments() {
+//   orm.selectAll("department");
+//   employeeTracker();
+// }
+
+function viewEmployeesByDepartment() {
+  connection.query("SELECT * FROM department", function(err, results) {
+    if (err) throw err;
+    var departmentArray = [];
+    // if (err) throw err;
+    for (var i = 0; i < results.length; i++) {
+      departmentArray.push(results[i].name);
+    }
+  inquirer
+    .prompt({
+      name: "departmentSelect",
+      type: "list",
+      message: "Select the department you would like to view the employees of",
+      choices: departmentArray
+    })
+    .then(function(answer){
+      connection.query(
+        "SELECT id FROM department WHERE name= ?",
+        answer.departmentSelect,
+        function(err, departmentSelectID) {
+          if (err) throw err;
+          var departmentID = departmentSelectID[0].id;
+          console.log(departmentID);
+
+      connection.query("SELECT first_name, last_name, title FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id WHERE role.department_id = ? AND department.id= ?", [departmentID, departmentID], function(err, res){
+        if (err) throw err;
+        console.table(res);
+      });
+
+      employeeTracker();
+    })
+    });
+});
 }
+
 // view all employee roles
 function viewRoles() {
   orm.selectAll("role");
@@ -140,8 +177,7 @@ function addEmployee() {
         var first = answer.manager.split(" ")[0];
         var last = answer.manager.split(" ")[1];
 
-        // get employee id from first name
-        // add in last name too
+        // get employee id from first and last name
         connection.query(
           "SELECT id FROM employee WHERE first_name= ? AND last_name= ?",
           [first, last],
