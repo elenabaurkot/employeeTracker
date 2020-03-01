@@ -140,10 +140,10 @@ function addEmployee() {
         var first = answer.manager.split(" ")[0];
         var last = answer.manager.split(" ")[1];
 
-        // get employee id from first name 
-        // add in last name too 
+        // get employee id from first name
+        // add in last name too
         connection.query(
-          "SELECT id FROM employee WHERE first_name= ?",
+          "SELECT id FROM employee WHERE first_name= ? AND last_name= ?",
           [first, last],
           function(err, resultManagerID) {
             if (err) throw err;
@@ -217,7 +217,15 @@ function addRole() {
             console.log(roleDepartmentID);
 
             // Add role name, salary, and department id to role table
-            orm.addRoleIn("role", "title", "salary", "department_id", answer.roleTitle, parseInt(answer.roleSalary), roleDepartmentID)
+            orm.addRoleIn(
+              "role",
+              "title",
+              "salary",
+              "department_id",
+              answer.roleTitle,
+              parseInt(answer.roleSalary),
+              roleDepartmentID
+            );
             employeeTracker();
           }
         );
@@ -225,44 +233,77 @@ function addRole() {
   });
 }
 
-function updateEmployee(){
-
-  connection.query(
-    "SELECT first_name, last_name FROM employee",
-    function(err, resultsEmployees
-    ) {
-      if (err) throw err;
-      var employeeArray = [];
-      for (var i = 0; i < resultsEmployees.length; i++) {
-        employeeArray.push(resultsEmployees[i].first_name + ' ' + resultsEmployees[i].last_name)
-      }
-  
-  // query the database for all items in the role table and make array of all roles
-  var roleArray = [];
-  connection.query("SELECT * FROM role", function(err, results) {
+function updateEmployee() {
+  connection.query("SELECT first_name, last_name FROM employee", function(
+    err,
+    resultsEmployees
+  ) {
     if (err) throw err;
-    // if (err) throw err;
-    for (var i = 0; i < results.length; i++) {
-      roleArray.push(results[i].title);
+    var employeeArray = [];
+    for (var i = 0; i < resultsEmployees.length; i++) {
+      employeeArray.push(
+        resultsEmployees[i].first_name + " " + resultsEmployees[i].last_name
+      );
     }
-    return roleArray;
-  })
-  inquirer
-   .prompt([
-      {
-        name: "employeeUpdate",
-        type: "list",
-        message: "Which employee would you like to update?",
-        choices: employeeArray
-      },
-      {
-        name: "employeeUpdate",
-        type: "list",
-        message: "What would you like to update their role to?",
-        choices: roleArray
+    // query the database for all items in the role table and make array of all roles
+    var roleArray = [];
+    connection.query("SELECT * FROM role", function(err, results) {
+      if (err) throw err;
+      // if (err) throw err;
+      for (var i = 0; i < results.length; i++) {
+        roleArray.push(results[i].title);
       }
-    ]).then(function(answer) {
-      // need to update old employee role with new
-    }) 
+      return roleArray;
+    });
+    inquirer
+      .prompt([
+        {
+          name: "employeeUpdate",
+          type: "list",
+          message: "Which employee would you like to update?",
+          choices: employeeArray
+        },
+        {
+          name: "roleUpdate",
+          type: "list",
+          message: "What would you like to update their role to?",
+          choices: roleArray
+        }
+      ])
+      .then(function(answer) {
+        // break up employee name into first and last 
+        var first = answer.employeeUpdate.split(" ")[0];
+        var last = answer.employeeUpdate.split(" ")[1];
+        // get selected employee's id
+        connection.query(
+          "SELECT id FROM employee WHERE first_name = ? AND last_name = ?",
+          [first, last],
+          function(err, getEmployeeID) {
+            if (err) throw err;
+            var employeeID = getEmployeeID[0].id;
+            console.log(employeeID);
+            // get id of updated role 
+            connection.query(
+              "SELECT id FROM role WHERE title = ?",
+              answer.roleUpdate,
+              function(err, getRoleID) {
+                if (err) throw err;
+                var roleID = getRoleID[0].id;
+                console.log(roleID);
+                // set employees role id equal to the id of the role where the id is equal to that employee's id
+                connection.query(
+                  "UPDATE employee SET role_id = ? WHERE id=?",
+                  [roleID, employeeID],
+                  function(err, results) {
+                    if (err) throw err;
+                    console.table("SELECT * FROM employee");
+                  }
+                );
+                employeeTracker();
+              }
+            );
+          }
+        );
+      });
   });
 }
