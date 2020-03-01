@@ -13,7 +13,7 @@ function employeeTracker() {
       choices: [
         "View All Employees",
         "View All Employees by Department",
-        "View All Employee Roles",
+        "View All Employees by Role",
         "Add Department",
         "Add Employee",
         "Add Role",
@@ -31,8 +31,8 @@ function employeeTracker() {
           viewEmployeesByDepartment();
           break;
 
-        case "View All Employee Roles":
-          viewRoles();
+        case "View All Employees by Role":
+          viewEmployeesByRole();
           break;
 
         case "Add Department":
@@ -63,19 +63,14 @@ function viewEmployees() {
   employeeTracker();
 }
 
-// view all departments
-// function viewDepartments() {
-//   orm.selectAll("department");
-//   employeeTracker();
-// }
-
+// view all employees by department
 function viewEmployeesByDepartment() {
-  connection.query("SELECT * FROM department", function(err, results) {
+  connection.query("SELECT * FROM department", function(err, res) {
     if (err) throw err;
     var departmentArray = [];
     // if (err) throw err;
-    for (var i = 0; i < results.length; i++) {
-      departmentArray.push(results[i].name);
+    for (var i = 0; i < res.length; i++) {
+      departmentArray.push(res[i].name);
     }
   inquirer
     .prompt({
@@ -92,22 +87,48 @@ function viewEmployeesByDepartment() {
           if (err) throw err;
           var departmentID = departmentSelectID[0].id;
           console.log(departmentID);
-
-      connection.query("SELECT first_name, last_name, title FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id WHERE role.department_id = ? AND department.id= ?", [departmentID, departmentID], function(err, res){
+      connection.query("SELECT first_name, last_name, name FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id WHERE role.department_id = ? AND department.id= ?", [departmentID, departmentID], function(err, res){
         if (err) throw err;
         console.table(res);
       });
-
       employeeTracker();
     })
     });
 });
 }
 
-// view all employee roles
-function viewRoles() {
-  orm.selectAll("role");
-  employeeTracker();
+// view employees by role
+function viewEmployeesByRole() {
+  connection.query("SELECT * FROM role", function(err, res) {
+    if (err) throw err;
+    var roleArray = [];
+    // if (err) throw err;
+    for (var i = 0; i < res.length; i++) {
+      roleArray.push(res[i].title);
+    }
+  inquirer
+    .prompt({
+      name: "roleSelect",
+      type: "list",
+      message: "Select the role for which you would like to view the employees in that role",
+      choices: roleArray
+    })
+    .then(function(answer){
+      connection.query(
+        "SELECT id FROM role WHERE title= ?",
+        answer.roleSelect,
+        function(err, roleSelectID) {
+          if (err) throw err;
+          var roleID = roleSelectID[0].id;
+          console.log(roleID);
+      connection.query("SELECT first_name, last_name, title FROM employee LEFT JOIN role ON employee.role_id = role.id WHERE role.id = ? AND employee.role_id= ?;", [roleID, roleID], function(err, res){
+        if (err) throw err;
+        console.table(res);
+      });
+      employeeTracker();
+    })
+  })
+})
 }
 
 // Add Department
