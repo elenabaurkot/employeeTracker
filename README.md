@@ -1,7 +1,7 @@
 # Employee Tracker
 The employee tracker is a program that allows a company to manage their departments and employees all from one place. Using this program companies can view employees in different roles and departments, add employees, roles and departments and update employees. 
 
- ![projectGif](./assets/readMe.gif)
+ ![projectGif](./assets/employeeTracker.gif)
 
 ## Table of Contents
 <ol>
